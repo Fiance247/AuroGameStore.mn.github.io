@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<title>Auro Game Store - Gold Tarif</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:white;
+  text-align:center;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== THEMES ===== */
+body.dark{
+  background:
+    linear-gradient(rgba(10,20,40,.85),rgba(8,18,37,.9)),
+    radial-gradient(circle at top,#1a2c5b,#050a18);
+}
+
+body.red{
+  background:
+    linear-gradient(rgba(80,0,0,.85),rgba(30,0,0,.95)),
+    radial-gradient(circle at top,#7a0000,#140000);
+}
+
+/* ===== HEADER ===== */
+header h1{color:#ffd700;margin-bottom:5px}
+
+/* ===== CARD ===== */
+.card{
+  background:rgba(0,0,0,.55);
+  margin:20px auto;
+  padding:25px;
+  width:90%;
+  max-width:400px;
+  border-radius:18px;
+  box-shadow:0 0 25px rgba(255,0,0,.3);
+  backdrop-filter:blur(6px);
+}
+
+/* ===== THEME BUTTON ===== */
+.theme-btn{
+  width:100%;
+  margin-bottom:15px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  background:#222;
+  color:white;
+  font-weight:bold;
+}
+
+/* ===== CONTROLS ===== */
+select,button{
+  margin:10px 0;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button{
+  background:#ff2a2a;
+  color:white;
+  font-weight:bold;
+}
+
+body.red button{background:#b00000}
+button:active{opacity:.7}
+
+/* ===== INFO ===== */
+.info{
+  margin-top:15px;
+  background:rgba(255,255,255,.1);
+  padding:15px;
+  border-radius:12px;
+}
+
+/* ===== COPY ===== */
+.copy{
+  margin-top:8px;
+  padding:10px;
+  background:rgba(255,255,255,.18);
+  border-radius:10px;
+  cursor:pointer;
+}
+.copy:active{opacity:.6}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;
+  bottom:30px;
+  background:#00c853;
+  padding:12px 22px;
+  border-radius:25px;
+  font-weight:bold;
+  opacity:0;
+  transition:.4s;
+}
+
+/* ===== SNOW ===== */
+.snowflake{
+  position:fixed;
+  top:-10px;
+  pointer-events:none;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  to{transform:translateY(110vh)}
+}
+
+footer{
+  margin-top:30px;
+  font-size:13px;
+  opacity:.8;
+}
+
+a{color:#00ffff}
+</style>
+</head>
+
+<body class="dark">
+
+<header>
+<h1>🎄 Auro Game Store 🎮</h1>
+<p>Түргэн шуурхай захиалсан Gold Account-ыг шууд өгнө</p>
+</header>
+
+<div class="card">
+
+<button class="theme-btn" onclick="toggleTheme()">🔴 RED MODE</button>
+
+<h2>Gold Tarif</h2>
+
+<select id="tarifSelect">
+  <option value="">Сонгоно уу</option>
+  <option value="100G">100G - 4,500 MNT</option>
+  <option value="500G">500G - 16,000 MNT</option>
+  <option value="1000G">1000G - 24,000 MNT</option>
+  <option value="3000G">3000G - 60,000 MNT</option>
+  <option value="5000G">5000G - 90,000 MNT</option>
+</select>
+
+<br>
+<button onclick="playClick(); showInfo()">Захиалах</button>
+
+<div class="info" id="infoBox" style="display:none;"></div>
+</div>
+
+<footer>
+🎅 Christmas Special • 2025<br>
+📌 <a href="https://www.facebook.com/share/1CBytoYVwV/" target="_blank">Page Link</a>
+</footer>
+
+<div class="toast" id="toast">📋 Хууллаа</div>
+
+<script>
+/* ===== CLICK SOUND (NO FILE) ===== */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+function playClick(){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type="square";
+  o.frequency.value=800;
+  g.gain.value=0.05;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime+0.05);
+}
+
+/* ===== THEME SWITCH ===== */
+const body=document.body;
+const themeBtn=document.querySelector(".theme-btn");
+const savedTheme=localStorage.getItem("theme")||"dark";
+body.classList.add(savedTheme);
+themeBtn.innerText=savedTheme==="dark"?"🔴 RED MODE":"🌑 DARK MODE";
+
+function toggleTheme(){
+  playClick();
+  if(body.classList.contains("dark")){
+    body.classList.replace("dark","red");
+    localStorage.setItem("theme","red");
+    themeBtn.innerText="🌑 DARK MODE";
+  }else{
+    body.classList.replace("red","dark");
+    localStorage.setItem("theme","dark");
+    themeBtn.innerText="🔴 RED MODE";
+  }
+}
+
+/* ===== ORDER INFO ===== */
+function showInfo(){
+  const s=document.getElementById("tarifSelect");
+  const box=document.getElementById("infoBox");
+
+  if(!s.value){
+    box.style.display="block";
+    box.innerHTML="❗ Түргэн шуурхай захиалах тарифаа сонгоно уу";
+    return;
+  }
+
+  const price={
+    "100G":"4,500 MNT",
+    "500G":"16,000 MNT",
+    "1000G":"24,000 MNT",
+    "3000G":"60,000 MNT",
+    "5000G":"90,000 MNT"
+  };
+
+  box.style.display="block";
+  box.innerHTML=`
+  ✅ Сонгосон: <b>${s.value}</b><br>
+  💰 Үнэ: <b>${price[s.value]}</b><br><br>
+
+  <div class="copy" onclick="copyText('5156447273')">
+    🏦 Khan Bank: <b>5156447273</b>
+  </div>
+
+  <div class="copy" onclick="copyText('80166216')">
+    📱 MonPay: <b>80166216</b>
+  </div>
+
+  <div class="copy" onclick="copyText('Facebook нэр')">
+    🧾 Гүйлгээний утга: <b>Facebook нэр</b>
+  </div>
+
+  <p style="font-size:13px;opacity:.8">(Дарвал хуулагдана)</p>
+  `;
+}
+
+/* ===== COPY ===== */
+function copyText(t){
+  playClick();
+  navigator.clipboard.writeText(t);
+  const toast=document.getElementById("toast");
+  toast.style.opacity=1;
+  setTimeout(()=>toast.style.opacity=0,1500);
+}
+
+/* ===== SNOW ===== */
+for(let i=0;i<40;i++){
+  const s=document.createElement("div");
+  s.className="snowflake";
+  s.innerText="❄";
+  s.style.left=Math.random()*100+"vw";
+  s.style.fontSize=Math.random()*18+10+"px";
+  s.style.animationDuration=(Math.random()*5+5)+"s";
+  document.body.appendChild(s);
+}
+</script>
+
+</body>
+</html>
